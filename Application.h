@@ -162,7 +162,6 @@ public:
 
     polarisTransformMatrix *camera_trans_mat; // Camera view matrix in polaris frame (p^T_v)
 
-    polarisTransformMatrix* cursor_base_matrix;
 
     void updateStaticMarkers();
     void load_gp_file();
@@ -170,13 +169,9 @@ public:
     bool polaris_on = true; // turn on/off polaris
 
     // TEST VARIABLES:
-    chai3d::cMultiMesh* cursorBlock_base;
-    chai3d::cShapeSphere* cursor_base;
-    chai3d::cShapeSphere* cursorAxisDev_base;
-
-    chai3d::cMultiMesh* cursorBlock_tool;
-    chai3d::cShapeSphere* cursor_tool;
-    chai3d::cShapeSphere* cursorAxisDev_tool;
+    chai3d::cMultiMesh* gpBlock_base;
+    chai3d::cShapeSphere* gp_base;
+    chai3d::cShapeSphere* gpAxisDev_base;
 
 
 };

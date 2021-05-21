@@ -44,7 +44,7 @@ public:
 
     Interface (QWidget *parent = 0, Qt::WindowFlags flags = 0);
     ~Interface ();
-
+    Ui::InterfaceClass ui;
 
 
     //--------------------------------------------------------------------------
@@ -53,7 +53,7 @@ public:
 
 private:
 
-    Ui::InterfaceClass ui;
+
     QShortcut *EscKey;
     QShortcut *FKey;
     QShortcut *SKey;

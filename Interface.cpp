@@ -197,18 +197,6 @@ void Interface::UpdateStatus()
 //------------------------------------------------------------------------------
 
 
-//void Interface::on_setBasePosition_clicked()
-//{
-//    QTextStream stream(stdout);
-//    stream <<"Reset Base Position"<< endl;
-
-//    Application->omnimagBase->cursor->setLocalPos(Application->omniTool->cursor->getLocalPos());
-//    Application->omnimagBase->pos = Application->omniTool->cursor->getLocalPos();
-
-//    Application->omnimagBase->cursor->setLocalRot(Application->omniTool->cursor->getLocalRot());
-//    Application->omnimagBase->rot = Application->omniTool->cursor->getLocalRot();
-//}
-
 void Interface::on_alignCamera_clicked()
 {
     if (Application)
@@ -232,11 +220,11 @@ void Interface::on_updateStaticMarkers_clicked()
 void Interface::on_hide_show_base_toggled(bool checked)
 {
     if (checked){
-        Application->cursorBlock_base->setTransparencyLevel(0);
+        Application->gpBlock_base->setTransparencyLevel(0);
         ui.hide_show_base->setText("Show Base");
 
     }else{
-        Application->cursorBlock_base->setTransparencyLevel(1);
+        Application->gpBlock_base->setTransparencyLevel(1);
         ui.hide_show_base->setText("Hide Base");
     }
 }

@@ -14,7 +14,7 @@
    <string>CHAI3D</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="Application.qrc">
     <normaloff>:/chai3d.ico</normaloff>:/chai3d.ico</iconset>
   </property>
   <property name="toolTip">
@@ -152,20 +152,20 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>50</y>
+             <y>60</y>
              <width>31</width>
              <height>16</height>
             </rect>
            </property>
            <property name="text">
-            <string>OBJ 2</string>
+            <string>CO</string>
            </property>
           </widget>
-          <widget class="QLCDNumber" name="tool_x">
+          <widget class="QLCDNumber" name="co_pos_x">
            <property name="geometry">
             <rect>
              <x>50</x>
-             <y>50</y>
+             <y>60</y>
              <width>64</width>
              <height>23</height>
             </rect>
@@ -181,14 +181,14 @@
             </rect>
            </property>
            <property name="text">
-            <string>OBJ 1</string>
+            <string>MAG</string>
            </property>
           </widget>
-          <widget class="QLCDNumber" name="tool_y">
+          <widget class="QLCDNumber" name="co_pos_y">
            <property name="geometry">
             <rect>
              <x>120</x>
-             <y>50</y>
+             <y>60</y>
              <width>64</width>
              <height>23</height>
             </rect>
@@ -214,11 +214,11 @@
             </rect>
            </property>
           </widget>
-          <widget class="QLCDNumber" name="tool_z">
+          <widget class="QLCDNumber" name="co_pos_z">
            <property name="geometry">
             <rect>
              <x>190</x>
-             <y>50</y>
+             <y>60</y>
              <width>64</width>
              <height>23</height>
             </rect>
@@ -498,7 +498,9 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="Application.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>actionShow_Settings</sender>
