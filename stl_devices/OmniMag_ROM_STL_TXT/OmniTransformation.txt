@@ -1,0 +1,6 @@
+Transformation from the Origin of the STL File to the Center of the OmniMag
+Tx: 39.91mm
+Ty: 111.02mm
+Tz: 48.50mm
+
+Rotations should already be taken care of in the ROM file, Origins should Match.

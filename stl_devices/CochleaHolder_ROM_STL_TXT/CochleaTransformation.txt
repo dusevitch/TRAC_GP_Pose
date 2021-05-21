@@ -1,0 +1,6 @@
+Transformation from Origin to Round window on Cochlea Holder Assembly
+Tx:26.28 mm
+Ty: -6.24mm
+Tx: 3.52mm
+
+Rotations are fine as is I changed the rom so they point in the same direction.
