@@ -124,8 +124,8 @@ public:
     chai3d::cMatrix3d reference_rotation;
 
     // Tools
-    GuidedTool* omnimagBase;
-    GuidedTool* omniTool;
+//    GuidedTool* omnimagBase;
+//    GuidedTool* omniTool;
 
     double x_omnimag_pos;
     double y_omnimag_pos;
@@ -155,7 +155,8 @@ public:
     Eigen::Matrix4d transf_base = Eigen::MatrixXd::Identity(4,4);
     polarisTransformMatrix *global_base_pose;
     polarisTransformMatrix *omnimag_pose;
-    polarisTransformMatrix *cube_pose;
+    polarisTransformMatrix *gp_phantom_pose;
+    polarisTransformMatrix *wand_pose;
 
     polarisTransformMatrix* getPoseData(int polaris_num);
     polarisTransformMatrix *temp_pose = NULL;
@@ -165,6 +166,7 @@ public:
 
     void updateStaticMarkers();
     void load_gp_file();
+    void load_gp_phantom();
 
     bool polaris_on = true; // turn on/off polaris
 
@@ -173,6 +175,13 @@ public:
     chai3d::cShapeSphere* gp_base;
     chai3d::cShapeSphere* gpAxisDev_base;
 
+    chai3d::cMultiMesh* omniToolBlock;
+    chai3d::cShapeSphere* omniTool;
+    chai3d::cShapeSphere* omniToolAxisDev;
+
+
+    void updateLCD(QLCDNumber* x_val, QLCDNumber* y_val, QLCDNumber* z_val, polarisTransformMatrix* pose);
+//    void updateLCD(QLCDNumber &x_val, QLCDNumber &y_val, QLCDNumber &z_val, polarisTransformMatrix &pose);
 
 };
 

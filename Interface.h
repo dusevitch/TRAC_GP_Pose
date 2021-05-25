@@ -97,25 +97,27 @@ private slots:
 
     void on_hide_show_base_toggled(bool checked);
 
-    void on_hide_show_tool_toggled(bool checked);
+//    void on_hide_show_tool_toggled(bool checked);
 
     void on_zoom_out_clicked();
 
     void on_zoom_in_clicked();
 
-    void on_x_pos_toggled(bool checked);
+//    void on_x_pos_toggled(bool checked);
 
-    void on_x_neg_toggled(bool checked);
+//    void on_x_neg_toggled(bool checked);
 
-    void on_y_pos_toggled(bool checked);
+//    void on_y_pos_toggled(bool checked);
 
-    void on_y_neg_toggled(bool checked);
+//    void on_y_neg_toggled(bool checked);
 
-    void on_z_pos_toggled(bool checked);
+//    void on_z_pos_toggled(bool checked);
 
-    void on_z_neg_toggled(bool checked);
+//    void on_z_neg_toggled(bool checked);
 
     void on_pushButton_clicked();
+
+    void on_load_gp_phantom_clicked();
 
 public:
 

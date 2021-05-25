@@ -22,7 +22,7 @@ static const uint qt_meta_data_Interface[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-      20,   14, // methods
+      14,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -40,16 +40,10 @@ static const uint qt_meta_data_Interface[] = {
      144,   10,   10,   10, 0x08,
      169,   10,   10,   10, 0x08,
      210,  202,   10,   10, 0x08,
-     242,  202,   10,   10, 0x08,
-     274,   10,   10,   10, 0x08,
-     296,   10,   10,   10, 0x08,
-     317,  202,   10,   10, 0x08,
-     340,  202,   10,   10, 0x08,
-     363,  202,   10,   10, 0x08,
-     386,  202,   10,   10, 0x08,
-     409,  202,   10,   10, 0x08,
-     432,  202,   10,   10, 0x08,
-     455,   10,   10,   10, 0x08,
+     242,   10,   10,   10, 0x08,
+     264,   10,   10,   10, 0x08,
+     285,   10,   10,   10, 0x08,
+     309,   10,   10,   10, 0x08,
 
        0        // eod
 };
@@ -62,12 +56,9 @@ static const char qt_meta_stringdata_Interface[] = {
     "on_alignCamera_clicked()\0"
     "on_updateStaticMarkers_clicked()\0"
     "checked\0on_hide_show_base_toggled(bool)\0"
-    "on_hide_show_tool_toggled(bool)\0"
     "on_zoom_out_clicked()\0on_zoom_in_clicked()\0"
-    "on_x_pos_toggled(bool)\0on_x_neg_toggled(bool)\0"
-    "on_y_pos_toggled(bool)\0on_y_neg_toggled(bool)\0"
-    "on_z_pos_toggled(bool)\0on_z_neg_toggled(bool)\0"
     "on_pushButton_clicked()\0"
+    "on_load_gp_phantom_clicked()\0"
 };
 
 void Interface::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -86,16 +77,10 @@ void Interface::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
         case 7: _t->on_alignCamera_clicked(); break;
         case 8: _t->on_updateStaticMarkers_clicked(); break;
         case 9: _t->on_hide_show_base_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 10: _t->on_hide_show_tool_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 11: _t->on_zoom_out_clicked(); break;
-        case 12: _t->on_zoom_in_clicked(); break;
-        case 13: _t->on_x_pos_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 14: _t->on_x_neg_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 15: _t->on_y_pos_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 16: _t->on_y_neg_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 17: _t->on_z_pos_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 18: _t->on_z_neg_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 19: _t->on_pushButton_clicked(); break;
+        case 10: _t->on_zoom_out_clicked(); break;
+        case 11: _t->on_zoom_in_clicked(); break;
+        case 12: _t->on_pushButton_clicked(); break;
+        case 13: _t->on_load_gp_phantom_clicked(); break;
         default: ;
         }
     }
@@ -133,9 +118,9 @@ int Interface::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 20)
+        if (_id < 14)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 20;
+        _id -= 14;
     }
     return _id;
 }

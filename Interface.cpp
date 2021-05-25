@@ -229,17 +229,17 @@ void Interface::on_hide_show_base_toggled(bool checked)
     }
 }
 
-void Interface::on_hide_show_tool_toggled(bool checked)
-{
-    if (checked){
-        Application->omniTool->cursorBlock->setTransparencyLevel(0);
-        ui.hide_show_tool->setText("Show Tool");
+//void Interface::on_hide_show_tool_toggled(bool checked)
+//{
+//    if (checked){
+//        Application->omniTool->cursorBlock->setTransparencyLevel(0);
+//        ui.hide_show_tool->setText("Show Tool");
 
-    }else{
-        Application->omniTool->cursorBlock->setTransparencyLevel(1);
-        ui.hide_show_tool->setText("Hide Tool");
-    }
-}
+//    }else{
+//        Application->omniTool->cursorBlock->setTransparencyLevel(1);
+//        ui.hide_show_tool->setText("Hide Tool");
+//    }
+//}
 
 void Interface::updateLCDpos(){
 
@@ -265,9 +265,9 @@ void Interface::updateLCDpos(){
     ui.objframe_y->display(QString::number(Application->omnimag_pose->pos.y()));
     ui.objframe_z->display(QString::number(Application->omnimag_pose->pos.z()));
 
-    ui.base_x->display(QString::number(Application->cube_pose->pos.x()));
-    ui.base_y->display(QString::number(Application->cube_pose->pos.y()));
-    ui.base_z->display(QString::number(Application->cube_pose->pos.z()));
+    ui.base_x->display(QString::number(Application->global_base_pose->pos.x()));
+    ui.base_y->display(QString::number(Application->global_base_pose->pos.y()));
+    ui.base_z->display(QString::number(Application->global_base_pose->pos.z()));
 
 }
 
@@ -286,87 +286,95 @@ void Interface::on_zoom_in_clicked()
 
 
 
-// Test the position of the x, y, and z arrows appearing-----------------------
-void Interface::on_x_pos_toggled(bool checked)
-{
-    if (checked){
-        Application->omniTool->setArrowTransparency(1, 0, 0, 0, 0, 0, Application->omniTool->arrow_array);
-        Application->omniTool->setArrowTransparency(1, 0, 0, 0, 0, 0, Application->omniTool->circ_arrow_array);
-        ui.x_pos->setStyleSheet("background-color: green");
-    }else{
-        Application->omniTool->allArrowsTransparent(Application->omniTool->arrow_array);
-        Application->omniTool->allArrowsTransparent(Application->omniTool->circ_arrow_array);
-        ui.x_pos->setStyleSheet("background-color: gray");
-    }
-}
+//// Test the position of the x, y, and z arrows appearing-----------------------
+//void Interface::on_x_pos_toggled(bool checked)
+//{
+//    if (checked){
+//        Application->omniTool->setArrowTransparency(1, 0, 0, 0, 0, 0, Application->omniTool->arrow_array);
+//        Application->omniTool->setArrowTransparency(1, 0, 0, 0, 0, 0, Application->omniTool->circ_arrow_array);
+//        ui.x_pos->setStyleSheet("background-color: green");
+//    }else{
+//        Application->omniTool->allArrowsTransparent(Application->omniTool->arrow_array);
+//        Application->omniTool->allArrowsTransparent(Application->omniTool->circ_arrow_array);
+//        ui.x_pos->setStyleSheet("background-color: gray");
+//    }
+//}
 
-void Interface::on_x_neg_toggled(bool checked)
-{
-    if (checked){
-        Application->omniTool->setArrowTransparency(0, 0, 0, 1, 0, 0, Application->omniTool->arrow_array);
-        Application->omniTool->setArrowTransparency(0, 0, 0, 1, 0, 0, Application->omniTool->circ_arrow_array);
-        ui.x_neg->setStyleSheet("background-color: green");
-    }else{
-        Application->omniTool->allArrowsTransparent(Application->omniTool->arrow_array);
-        Application->omniTool->allArrowsTransparent(Application->omniTool->circ_arrow_array);
-        ui.x_neg->setStyleSheet("background-color: gray");
-    }
-}
+//void Interface::on_x_neg_toggled(bool checked)
+//{
+//    if (checked){
+//        Application->omniTool->setArrowTransparency(0, 0, 0, 1, 0, 0, Application->omniTool->arrow_array);
+//        Application->omniTool->setArrowTransparency(0, 0, 0, 1, 0, 0, Application->omniTool->circ_arrow_array);
+//        ui.x_neg->setStyleSheet("background-color: green");
+//    }else{
+//        Application->omniTool->allArrowsTransparent(Application->omniTool->arrow_array);
+//        Application->omniTool->allArrowsTransparent(Application->omniTool->circ_arrow_array);
+//        ui.x_neg->setStyleSheet("background-color: gray");
+//    }
+//}
 
-void Interface::on_y_pos_toggled(bool checked)
-{
-    if (checked){
-        Application->omniTool->setArrowTransparency(0, 1, 0, 0, 0, 0, Application->omniTool->arrow_array);
-        Application->omniTool->setArrowTransparency(0, 1, 0, 0, 0, 0, Application->omniTool->circ_arrow_array);
-        ui.y_pos->setStyleSheet("background-color: green");
-    }else{
-        Application->omniTool->allArrowsTransparent(Application->omniTool->arrow_array);
-        Application->omniTool->allArrowsTransparent(Application->omniTool->circ_arrow_array);
-        ui.y_pos->setStyleSheet("background-color: gray");
-    }
-}
+//void Interface::on_y_pos_toggled(bool checked)
+//{
+//    if (checked){
+//        Application->omniTool->setArrowTransparency(0, 1, 0, 0, 0, 0, Application->omniTool->arrow_array);
+//        Application->omniTool->setArrowTransparency(0, 1, 0, 0, 0, 0, Application->omniTool->circ_arrow_array);
+//        ui.y_pos->setStyleSheet("background-color: green");
+//    }else{
+//        Application->omniTool->allArrowsTransparent(Application->omniTool->arrow_array);
+//        Application->omniTool->allArrowsTransparent(Application->omniTool->circ_arrow_array);
+//        ui.y_pos->setStyleSheet("background-color: gray");
+//    }
+//}
 
-void Interface::on_y_neg_toggled(bool checked)
-{
-    if (checked){
-        Application->omniTool->setArrowTransparency(0, 0, 0, 0, 1, 0, Application->omniTool->arrow_array);
-        Application->omniTool->setArrowTransparency(0, 0, 0, 0, 1, 0, Application->omniTool->circ_arrow_array);
-        ui.y_neg->setStyleSheet("background-color: green");
-    }else{
-        Application->omniTool->allArrowsTransparent(Application->omniTool->arrow_array);
-        Application->omniTool->allArrowsTransparent(Application->omniTool->circ_arrow_array);
-        ui.y_neg->setStyleSheet("background-color: gray");
-    }
-}
+//void Interface::on_y_neg_toggled(bool checked)
+//{
+//    if (checked){
+//        Application->omniTool->setArrowTransparency(0, 0, 0, 0, 1, 0, Application->omniTool->arrow_array);
+//        Application->omniTool->setArrowTransparency(0, 0, 0, 0, 1, 0, Application->omniTool->circ_arrow_array);
+//        ui.y_neg->setStyleSheet("background-color: green");
+//    }else{
+//        Application->omniTool->allArrowsTransparent(Application->omniTool->arrow_array);
+//        Application->omniTool->allArrowsTransparent(Application->omniTool->circ_arrow_array);
+//        ui.y_neg->setStyleSheet("background-color: gray");
+//    }
+//}
 
-void Interface::on_z_pos_toggled(bool checked)
-{
-    if (checked){
-        Application->omniTool->setArrowTransparency(0, 0, 1, 0, 0, 0, Application->omniTool->arrow_array);
-        Application->omniTool->setArrowTransparency(0, 0, 1, 0, 0, 0, Application->omniTool->circ_arrow_array);
-        ui.z_pos->setStyleSheet("background-color: green");
-    }else{
-        Application->omniTool->allArrowsTransparent(Application->omniTool->arrow_array);
-        Application->omniTool->allArrowsTransparent(Application->omniTool->circ_arrow_array);
-        ui.z_pos->setStyleSheet("background-color: gray");
-    }
-}
+//void Interface::on_z_pos_toggled(bool checked)
+//{
+//    if (checked){
+//        Application->omniTool->setArrowTransparency(0, 0, 1, 0, 0, 0, Application->omniTool->arrow_array);
+//        Application->omniTool->setArrowTransparency(0, 0, 1, 0, 0, 0, Application->omniTool->circ_arrow_array);
+//        ui.z_pos->setStyleSheet("background-color: green");
+//    }else{
+//        Application->omniTool->allArrowsTransparent(Application->omniTool->arrow_array);
+//        Application->omniTool->allArrowsTransparent(Application->omniTool->circ_arrow_array);
+//        ui.z_pos->setStyleSheet("background-color: gray");
+//    }
+//}
 
-void Interface::on_z_neg_toggled(bool checked)
-{
-    if (checked){
-        Application->omniTool->setArrowTransparency(0, 0, 0, 0, 0, 1, Application->omniTool->arrow_array);
-        Application->omniTool->setArrowTransparency(0, 0, 0, 0, 0, 1, Application->omniTool->circ_arrow_array);
-        ui.z_neg->setStyleSheet("background-color: green");
-    }else{
-        Application->omniTool->allArrowsTransparent(Application->omniTool->arrow_array);
-        Application->omniTool->allArrowsTransparent(Application->omniTool->circ_arrow_array);
-        ui.z_neg->setStyleSheet("background-color: gray");
-    }
-}
+//void Interface::on_z_neg_toggled(bool checked)
+//{
+//    if (checked){
+//        Application->omniTool->setArrowTransparency(0, 0, 0, 0, 0, 1, Application->omniTool->arrow_array);
+//        Application->omniTool->setArrowTransparency(0, 0, 0, 0, 0, 1, Application->omniTool->circ_arrow_array);
+//        ui.z_neg->setStyleSheet("background-color: green");
+//    }else{
+//        Application->omniTool->allArrowsTransparent(Application->omniTool->arrow_array);
+//        Application->omniTool->allArrowsTransparent(Application->omniTool->circ_arrow_array);
+//        ui.z_neg->setStyleSheet("background-color: gray");
+//    }
+//}
 
 void Interface::on_pushButton_clicked()
 {
     Application->load_gp_file();
     ui.gp_file_label->setText(Application->loaded_file);
+    ui.gp_phantom_label->setText("NO FILE");
+}
+
+void Interface::on_load_gp_phantom_clicked()
+{
+    Application->load_gp_phantom();
+    ui.gp_phantom_label->setText("PHANTOM LOADED");
+    ui.gp_file_label->setText("NO FILE");
 }

@@ -36,13 +36,39 @@ IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
 void printMatrix3d(chai3d::cMatrix3d matrix, std::string name);
 void printVector3d(chai3d::cVector3d vec, QString name);
 Eigen::Matrix4d inverseTransformationMatrix(const Eigen::Matrix4d &trans_mat);
-polarisTransformMatrix* buildStructfromTransMatrix(Eigen::Matrix4d &trans_mat);
+polarisTransformMatrix* buildStructfromTransMatrix(Eigen::Matrix4d &trans_mat, int polaris_num);
 void breakTransMat(Eigen::Matrix4d &trans_mat, chai3d::cMatrix3d &rot, chai3d::cVector3d &pos);
 Eigen::Matrix4d buildTransMatrix(chai3d::cMatrix3d rot, chai3d::cVector3d pos);
 
 
 ApplicationWidget::ApplicationWidget (QWidget *parent)
 {
+
+    //--------------------------------------------------------------------------
+    // Polaris Spectra Device
+    //--------------------------------------------------------------------------
+
+    // create a haptic device handler
+    polaris = new PolarisSpectra();
+
+    if (polaris_on){
+
+        // initialize the polaris system
+        polaris->Initialize();
+
+        // activate all the ports
+        if (polaris->nActivateAllPorts())
+            std::cout << "Tools have been activated!" << endl;
+
+        // Start the Polaris system tracking
+        if (polaris->nStartTracking() == REPLY_OKAY){
+            std::cout << "Tracking has started!" << endl;}
+        else{std::cout << "Device could not start tracking!" << endl;}
+    }
+    polaris->nGetTXTransforms(0);
+    updateStaticMarkers();
+    qDebug()<< "global base pos: "<< global_base_pose->pos.x() << ", " << global_base_pose->pos.y() << ", "<< global_base_pose->pos.z() ;
+
     //--------------------------------------------------------------------------
     // INITIALIZATION
     //--------------------------------------------------------------------------
@@ -70,13 +96,18 @@ ApplicationWidget::ApplicationWidget (QWidget *parent)
     // create a camera and insert it into the virtual world
     m_camera = new cCamera(m_world);
     m_world->addChild(m_camera);
-    m_camera->set(cVector3d(0.0, 0.0, 1000.0),    // camera position (eye)
-                cVector3d(0.0, 0.0, 0.0),    // lookat position (target)
-                cVector3d(1.0, 0.0, 0.0));   // direction of the (up) vector
+//    m_camera->set(global_base_pose->pos + global_base_pose->inv_rot_mat*cVector3d(0.0, 0.0, 1000.0),    // camera position (eye)
+//                cVector3d(0.0, 0.0, 0.0),    // lookat position (target)
+//                cVector3d(global_base_pose->pos.x(), 0.0, 0.0));   // direction of the (up) vector
+    m_camera->set(cVector3d(0.0, 0.0, 0.0),    // camera position (eye)
+                 global_base_pose->pos,    // lookat position (target)
+                 global_base_pose->rot_mat.getCol0());   // direction of the (up) vector
+
+    printVector3d(global_base_pose->rot_mat.getCol0(),"first column of vector3d matrix");
 
     // Get and print camera matrix in the polaris frame
     Eigen::Matrix4d camera_trans = buildTransMatrix(m_camera->getLocalRot(), m_camera->getLocalPos());
-    camera_trans_mat = buildStructfromTransMatrix(camera_trans); // Camera Struct
+    //camera_trans_mat = buildStructfromTransMatrix(camera_trans); // Camera Struct
 //    qDebug() << "Camera 3d matrix: ";
 //    printMatrix3d(m_camera->getLocalRot(), "Camera");
 //    printVector3d(m_camera->getLocalPos(), "CAMERA");
@@ -110,29 +141,6 @@ ApplicationWidget::ApplicationWidget (QWidget *parent)
 
 
     //--------------------------------------------------------------------------
-    // Polaris Spectra Device
-    //--------------------------------------------------------------------------
-
-    // create a haptic device handler
-    polaris = new PolarisSpectra();
-
-    if (polaris_on){
-
-
-        // initialize the polaris system
-        polaris->Initialize();
-
-        // activate all the ports
-        if (polaris->nActivateAllPorts())
-            std::cout << "Tools have been activated!" << endl;
-
-        // Start the Polaris system tracking
-        if (polaris->nStartTracking() == REPLY_OKAY){
-            std::cout << "Tracking has started!" << endl;}
-        else{std::cout << "Device could not start tracking!" << endl;}
-    }
-
-    //--------------------------------------------------------------------------
     // OBJECTS
     //--------------------------------------------------------------------------
 
@@ -150,7 +158,7 @@ ApplicationWidget::ApplicationWidget (QWidget *parent)
     gp_base->setLocalPos(chai3d::cVector3d(0,0,0));
     gpAxisDev_base->setUseTransparency(true, false);
     gpAxisDev_base->setTransparencyLevel(1);
-    gpBlock_base->loadFromFile("/home/telerobotics/src/TRAC_CI_Position/stl_devices/OmniMag_ROM_STL_TXT/Omnimag_stl_cube_core.STL"); // TODO uncomment
+    gpBlock_base->loadFromFile("/home/telerobotics/src/TRAC_CI_Position/stl_devices/Omnimag_cube_stl_front.STL"); // TODO uncomment
     gpBlock_base->scale(1);
     gpBlock_base->setLocalPos(chai3d::cVector3d(0,0,0));
     gpBlock_base->setLocalRot(chai3d::cMatrix3d(1, 0, 0, 0)); // this formulation is vector for axis and radians angle.;
@@ -158,9 +166,34 @@ ApplicationWidget::ApplicationWidget (QWidget *parent)
     gpBlock_base->setTransparencyLevel(.3);
 
 
-    // GUIDED OMNIMAGNET TOOL
-    omniTool = new GuidedTool(m_world);
-    omniTool->loadToolFile("/home/telerobotics/src/TRAC_CI_Position/json_files/omnimag_settings.json",0); // TODO Uncomment
+    //    // OMNIMAGNET
+    omniToolBlock = new chai3d::cMultiMesh();
+    omniTool = new chai3d::cShapeSphere(0.05);
+    omniToolAxisDev = new chai3d::cShapeSphere(0.01);
+    // Add children to the main object sphere
+    omniTool->addChild(omniToolAxisDev);
+    omniTool->addChild(omniToolBlock);
+    // add the object Sphere to the world
+    m_world->addChild(omniTool);
+    omniTool->setUseTransparency(true, false);
+    omniToolAxisDev->setUseTransparency(true, false);
+    omniToolBlock->loadFromFile("/home/telerobotics/src/TRAC_CI_Position/stl_devices/Omnimag_cube_stl_front.STL"); // TODO uncomment
+    omniToolBlock->scale(1);
+    omniToolBlock->setLocalPos(chai3d::cVector3d(0,0,0));
+    omniToolBlock->setLocalRot(chai3d::cMatrix3d(1, 0, 0, 0)); // this formulation is vector for axis and radians angle.;
+    omniToolBlock->setUseTransparency(true, true);
+
+    omniTool->setTransparencyLevel(0);
+    omniToolBlock->setTransparencyLevel(1);
+    omniToolAxisDev->setTransparencyLevel(0);
+
+
+//    // GUIDED OMNIMAGNET TOOL
+//    omniTool = new GuidedTool(m_world);
+//    omniTool->loadToolFile("/home/telerobotics/src/TRAC_CI_Position/json_files/omnimag_settings.json",0); // TODO Uncomment
+    omniTool->setTransparencyLevel(0);
+    omniToolBlock->setTransparencyLevel(1);
+    omniToolAxisDev->setTransparencyLevel(0);
 
 }
 //------------------------------------------------------------------------------
@@ -183,16 +216,10 @@ void* ApplicationWidget::hapticThread ()
 
     int counter = 0;
 
-
-
-    polaris->nGetTXTransforms(0);
     updateStaticMarkers();
 
+    gp_base->setLocalPos(cVector3d(1000,1000,1000));
 
-
-    printVector3d(cube_pose->pos, "Cube Position");
-    gp_base->setLocalPos(cube_pose->pos + (cube_pose->inv_rot_mat*cVector3d(0,0,-200)));
-    gp_base->setLocalRot(cube_pose->rot_mat); // this formulation is vector for axis and radians angle.;
 
     while (m_running)
     {
@@ -210,21 +237,22 @@ void* ApplicationWidget::hapticThread ()
         if (polaris_on){ // If tracker is off
             polaris->nGetTXTransforms(0); // Get the current transformation information from the Polaris system
 
-
             // omni_pose update position
             omnimag_pose = getPoseData(1);
+            printVector3d(omnimag_pose->pos, "omnimag pos");
+            printVector3d(global_base_pose->pos, "global pos");
+            omniTool->setLocalPos(omnimag_pose->pos);
+            omniTool->setLocalRot(omnimag_pose->rot_mat);
+            //omniTool->updatePoseAlignment(global_base_pose, omnimag_pose->pos, omnimag_pose->rot_mat, gpBlock_base);
 
+            // Get the pose data for the wand
+            wand_pose = getPoseData(4);
 
-            omniTool->cursor->setLocalPos(omnimag_pose->pos);
-            omniTool->cursor->setLocalRot(omnimag_pose->rot_mat);
-            omniTool->updatePoseAlignment(global_base_pose, omnimag_pose->pos, omnimag_pose->rot_mat, gpBlock_base);
-
+            updateLCD(m_parent->ui.wand_x, m_parent->ui.wand_y, m_parent->ui.wand_z, wand_pose);
         }
 
 //        printVector3d(omnimag_pose->pos, "Omnimag cur_Position");
-
         m_parent->updateLCDpos();
-
     }
 
     // update state
@@ -242,12 +270,11 @@ void* ApplicationWidget::hapticThread ()
 void ApplicationWidget::updateCamera_to_base(){
 
         // CAMERA SET FUNCTION
-        chai3d::cVector3d camera_position = chai3d::cVector3d(global_base_pose->pos.x(),global_base_pose->pos.y(),global_base_pose->pos.z()+2000);
+        chai3d::cVector3d camera_position = chai3d::cVector3d(global_base_pose->pos.x(),global_base_pose->pos.y(),global_base_pose->pos.z()) +global_base_pose->inv_rot_mat*cVector3d(0,0,1000);
         chai3d::cVector3d look_at_position = global_base_pose->pos;
         chai3d::cVector3d direction_up = global_base_pose->rot_mat.getCol0();
 
         m_camera->set(camera_position, look_at_position, direction_up);
-
 }
 
 
@@ -303,8 +330,23 @@ void ApplicationWidget::load_gp_file(){
     m_parent->ui.co_pos_y->display( cochleaPose.pos.y());
     m_parent->ui.co_pos_z->display( cochleaPose.pos.z());
 
-    loaded_file = fileNames[0];
+    gp_base->setLocalPos(cochleaPose.pos + cVector3d(0,200,0));
+    gp_base->setLocalRot(cochleaPose.rot_mat);
 
+    loaded_file = fileNames[0];
+}
+
+void ApplicationWidget::load_gp_phantom(){
+    gp_phantom_pose = getPoseData(3);
+
+    cMatrix3d mat = gp_phantom_pose->rot_mat;
+
+    m_parent->ui.co_pos_x->display( gp_phantom_pose->pos.x());
+    m_parent->ui.co_pos_y->display( gp_phantom_pose->pos.y());
+    m_parent->ui.co_pos_z->display( gp_phantom_pose->pos.z());
+
+    gp_base->setLocalPos(gp_phantom_pose->pos + cVector3d(0,0,0));
+    gp_base->setLocalRot(mat);
 }
 
 
@@ -312,6 +354,7 @@ void ApplicationWidget::updateStaticMarkers(){
     global_base_pose = getPoseData(2);
 }
 
+// Gets raw Polaris Data
 polarisTransformMatrix* ApplicationWidget::getPoseData(int polaris_num){
     polarisTransformMatrix* pose_struct = new polarisTransformMatrix(); // output struct
 
@@ -326,7 +369,7 @@ polarisTransformMatrix* ApplicationWidget::getPoseData(int polaris_num){
                       rot[1][0], rot[1][1], rot[1][2], pos_t.y,
                       rot[2][0], rot[2][1], rot[2][2], pos_t.z,
                       0.0      , 0.0      , 0.0      , 1.0;
-        pose_struct = buildStructfromTransMatrix(curr_trans);
+        pose_struct = buildStructfromTransMatrix(curr_trans, polaris_num);
     }else{
         //qDebug() << "TRACKER NOT IN RANGE";
     }
@@ -353,7 +396,7 @@ Eigen::Matrix4d inverseTransformationMatrix(const Eigen::Matrix4d &trans_mat){
     return inv_trans_mat;
 }
 
-polarisTransformMatrix* buildStructfromTransMatrix(Eigen::Matrix4d &trans_mat){
+polarisTransformMatrix* buildStructfromTransMatrix(Eigen::Matrix4d &trans_mat, int polaris_num){
     polarisTransformMatrix* pose_struct = new polarisTransformMatrix();
 
     // Rotation
@@ -374,6 +417,7 @@ polarisTransformMatrix* buildStructfromTransMatrix(Eigen::Matrix4d &trans_mat){
     pose_struct->trans_mat = trans_mat;
     pose_struct->inv_trans_mat = inverseTransformationMatrix(trans_mat);
 
+    pose_struct->polaris_num = polaris_num;
     // Return and delete
     return pose_struct;
     delete pose_struct;
@@ -461,7 +505,6 @@ void _hapticThread (void *arg)
 
 //------------------------------------------------------------------------------
 
-
 void printMatrix3d(chai3d::cMatrix3d matrix, std::string name)
 {
     std::cout << "-------MATRIX: "<< name << " :---- " << std::endl;
@@ -473,8 +516,8 @@ void printMatrix3d(chai3d::cMatrix3d matrix, std::string name)
 
 void printVector3d(chai3d::cVector3d vec, QString name)
 {
-    //qDebug() << "Pos of " <<  name <<  " X: " << vec.x() << " Y: " << vec.y() << " Z: " << vec.z();
-    std::cout << "Pos of " <<  name.toStdString() <<  " X: " << vec.x() << " Y: " << vec.y() << " Z: " << vec.z() << std::endl;
+    qDebug() << "Pos of " <<  name <<  " X: " << vec.x() << " Y: " << vec.y() << " Z: " << vec.z();
+//    std::cout << "Pos of " <<  name.toStdString() <<  " X: " << vec.x() << " Y: " << vec.y() << " Z: " << vec.z() << std::endl;
 }
 
 Eigen::Matrix4d buildTransMatrix(chai3d::cMatrix3d rot, chai3d::cVector3d pos){
@@ -495,3 +538,17 @@ void breakTransMat(Eigen::Matrix4d &trans_mat, chai3d::cMatrix3d rot, chai3d::cV
     // Position Vector
     pos = chai3d::cVector3d(rot_eig(3,0), rot_eig(3,1), rot_eig(3,2));
 }
+
+void ApplicationWidget::updateLCD(QLCDNumber* x_val, QLCDNumber* y_val, QLCDNumber* z_val, polarisTransformMatrix* pose){
+    if (polaris->m_dtHandleInformation[pose->polaris_num].Xfrms.ulFlags == TRANSFORM_VALID ) {
+        x_val->display(pose->pos.x());
+        y_val->display(pose->pos.y());
+        z_val->display(pose->pos.z());
+    }else{
+        x_val->display(-1000);
+        y_val->display(-1000);
+        z_val->display(-1000);
+    }
+}
+
+//multiply above by global inv rot mat
