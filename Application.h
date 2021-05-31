@@ -28,6 +28,7 @@
 #include "json/json.h"
 #include "polaristransformmatrix.h"
 #include <eigen3/Eigen/Dense>
+#include "cochleapath.h"
 
 void _hapticThread (void *arg);
 
@@ -167,7 +168,7 @@ public:
     polarisTransformMatrix *gp_phantom_pose;
     polarisTransformMatrix *wand_pose;
 
-    polarisTransformMatrix* getPoseData(int polaris_num);
+    polarisTransformMatrix* getPoseData(int polaris_num, bool global_flag=false);
     polarisTransformMatrix *temp_pose = NULL;
 
     polarisTransformMatrix *camera_trans_mat; // Camera view matrix in polaris frame (p^T_v)
@@ -180,7 +181,7 @@ public:
 
     bool polaris_on = true; // turn on/off polaris
 
-
+    CochleaPath *cochlea_path;
 
     void updateLCD(QLCDNumber* x_val, QLCDNumber* y_val, QLCDNumber* z_val, polarisTransformMatrix* pose);
 //    void updateLCD(QLCDNumber &x_val, QLCDNumber &y_val, QLCDNumber &z_val, polarisTransformMatrix &pose);

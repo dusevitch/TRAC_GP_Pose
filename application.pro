@@ -91,7 +91,8 @@ unix {
 SOURCES   += application.cpp \
     Interface.cpp \
     main.cpp \
-    guidedtool.cpp
+    guidedtool.cpp \
+    cochleapath.cpp
 
 HEADERS   += Application.h \
     Interface.h \
@@ -110,7 +111,8 @@ HEADERS   += Application.h \
     ../Libraries/json/writer.h \
     APIStructures.h \
     polaristransformmatrix.h \
-    guidedtool.h
+    guidedtool.h \
+    cochleapath.h
 
 
     # HEADERS FOR THE CHAI3d LIBRARY

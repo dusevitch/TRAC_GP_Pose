@@ -518,6 +518,23 @@
          </item>
         </layout>
        </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QLineEdit" name="scale_val"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="scale_button">
+           <property name="text">
+            <string>Scale</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
      </widget>
     </item>

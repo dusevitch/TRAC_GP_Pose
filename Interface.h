@@ -119,6 +119,8 @@ private slots:
 
     void on_load_gp_phantom_clicked();
 
+    void on_scale_button_toggled(bool checked);
+
 public:
 
     int  Start();

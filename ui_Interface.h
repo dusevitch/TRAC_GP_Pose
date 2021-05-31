@@ -19,6 +19,7 @@
 #include <QtGui/QHeaderView>
 #include <QtGui/QLCDNumber>
 #include <QtGui/QLabel>
+#include <QtGui/QLineEdit>
 #include <QtGui/QMainWindow>
 #include <QtGui/QPushButton>
 #include <QtGui/QStatusBar>
@@ -81,6 +82,9 @@ public:
     QPushButton *zoom_out;
     QLabel *Zoom_Label;
     QPushButton *zoom_in;
+    QHBoxLayout *horizontalLayout_4;
+    QLineEdit *scale_val;
+    QPushButton *scale_button;
     QToolBar *toolBar;
     QStatusBar *statusBar;
 
@@ -332,6 +336,23 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_3);
 
+        horizontalLayout_4 = new QHBoxLayout();
+        horizontalLayout_4->setSpacing(6);
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        scale_val = new QLineEdit(Settings);
+        scale_val->setObjectName(QString::fromUtf8("scale_val"));
+
+        horizontalLayout_4->addWidget(scale_val);
+
+        scale_button = new QPushButton(Settings);
+        scale_button->setObjectName(QString::fromUtf8("scale_button"));
+        scale_button->setCheckable(true);
+
+        horizontalLayout_4->addWidget(scale_button);
+
+
+        verticalLayout->addLayout(horizontalLayout_4);
+
 
         horizontalLayout->addWidget(Settings);
 
@@ -390,6 +411,7 @@ public:
         zoom_out->setText(QApplication::translate("InterfaceClass", "-", 0, QApplication::UnicodeUTF8));
         Zoom_Label->setText(QApplication::translate("InterfaceClass", "Zoom", 0, QApplication::UnicodeUTF8));
         zoom_in->setText(QApplication::translate("InterfaceClass", "+", 0, QApplication::UnicodeUTF8));
+        scale_button->setText(QApplication::translate("InterfaceClass", "Scale", 0, QApplication::UnicodeUTF8));
         toolBar->setWindowTitle(QApplication::translate("InterfaceClass", "toolBar", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 

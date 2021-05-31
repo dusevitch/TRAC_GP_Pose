@@ -797,7 +797,7 @@ void GuidedTool::updatePoseAlignment(polarisTransformMatrix* base_pose, chai3d::
     allArrowsTransparent(arrow_array);
 
     //std::cout << "K vals:  X: " << k.x() << " Y: " << k.y() << " Z: " << k.z() << "  rot_epsilon: " << rot_epsilon <<" arrow_guidance_selected: " << arrow_guidance_selected << " circ_or_straight: "<< circ_or_straight << std::endl;
-    qDebug() << "Pos of k" <<  " X: " << k.x() << " Y: " << k.y() << " Z: " << k.z();
+    //qDebug() << "Pos of k" <<  " X: " << k.x() << " Y: " << k.y() << " Z: " << k.z();
 
 
     //TODO: uncomment this for the future when you want to

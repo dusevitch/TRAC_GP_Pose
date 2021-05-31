@@ -40,7 +40,7 @@ Eigen::Matrix4d inverseTransformationMatrix(const Eigen::Matrix4d &trans_mat);
 polarisTransformMatrix* buildStructfromTransMatrix(Eigen::Matrix4d &trans_mat, int polaris_num);
 void breakTransMat(Eigen::Matrix4d &trans_mat, chai3d::cMatrix3d &rot, chai3d::cVector3d &pos);
 Eigen::Matrix4d buildTransMatrix(chai3d::cMatrix3d rot, chai3d::cVector3d pos);
-
+Eigen::Matrix3d chai3dToMatrix3d(chai3d::cMatrix3d matrix);
 
 ApplicationWidget::ApplicationWidget (QWidget *parent)
 {
@@ -243,8 +243,10 @@ void* ApplicationWidget::hapticThread ()
 
             if(base_flag==1){ // flag for phantom
                 omniTool->updatePoseAlignment(gp_phantom_pose, omnimag_pose->pos, omnimag_pose->rot_mat, gpBlock_base, global_base_pose->rot_mat*mag_offset);
+//                omniTool->updatePoseAlignment(gp_phantom_pose, omnimag_pose->pos, omnimag_pose->rot_mat, gpBlock_base, mag_offset);
             }else if (base_flag==2){ // Flag for actual cochlea
                 omniTool->updatePoseAlignment(cochleaPose, omnimag_pose->pos, omnimag_pose->rot_mat, gpBlock_base, global_base_pose->rot_mat*mag_offset);
+//                omniTool->updatePoseAlignment(cochleaPose, omnimag_pose->pos, omnimag_pose->rot_mat, gpBlock_base, mag_offset);
             }else{ // Neither phantom data or cochlea data loaded
                 omniTool->setPosition(omnimag_pose->pos);
                 omniTool->setOrientation(omnimag_pose->rot_mat);
@@ -269,6 +271,10 @@ void* ApplicationWidget::hapticThread ()
     // exit thread
     return (NULL);
 }
+
+
+// TODO: camera pos -> back into the polaris frame, update the pos alignment back into the polaris frame -> any kind of sending of data, put into the polaris frame
+// for updating!!!!!!
 
 
 // CHANGE THE CAMERA ANGLE --> connect button to do this:
@@ -350,6 +356,7 @@ void ApplicationWidget::load_gp_file(){
     m_parent->ui.co_pos_z->display( cochleaPose->pos.z());
 
     gp_base->setLocalPos(cochleaPose->pos + global_base_pose->rot_mat*mag_offset);
+//    gp_base->setLocalPos(cochleaPose->pos +mag_offset);
     gp_base->setLocalRot(cochleaPose->rot_mat);
 
     loaded_file = fileNames[0];
@@ -366,16 +373,20 @@ void ApplicationWidget::load_gp_phantom(){
     m_parent->ui.co_pos_z->display( gp_phantom_pose->pos.z());
 
     gp_base->setLocalPos(gp_phantom_pose->pos + global_base_pose->rot_mat*mag_offset);
+    //gp_base->setLocalPos(gp_phantom_pose->pos + mag_offset);
     gp_base->setLocalRot(mat);
+
+    cochlea_path = new CochleaPath("phantom_b_vectors_normalized_left.csv", gp_phantom_pose->pos, m_world, global_base_pose->rot_mat);
+
 }
 
 
 void ApplicationWidget::updateStaticMarkers(){
-    global_base_pose = getPoseData(2);
+    global_base_pose = getPoseData(2, true);
 }
 
 // Gets raw Polaris Data
-polarisTransformMatrix* ApplicationWidget::getPoseData(int polaris_num){
+polarisTransformMatrix* ApplicationWidget::getPoseData(int polaris_num, bool global_flag){
     polarisTransformMatrix* pose_struct = new polarisTransformMatrix(); // output struct
 
     if (polaris->m_dtHandleInformation[polaris_num].Xfrms.ulFlags == TRANSFORM_VALID ) {
@@ -385,10 +396,38 @@ polarisTransformMatrix* ApplicationWidget::getPoseData(int polaris_num){
         RotationMatrix rot;
         CvtQuatToRotationMatrix(&quatRot, rot);
         Eigen::Matrix4d curr_trans;
-        curr_trans << rot[0][0], rot[0][1], rot[0][2], pos_t.x,
-                      rot[1][0], rot[1][1], rot[1][2], pos_t.y,
-                      rot[2][0], rot[2][1], rot[2][2], pos_t.z,
-                      0.0      , 0.0      , 0.0      , 1.0;
+
+//        // Change all coordinates into the given frame, except if you are getting the global coordinates
+//        if (!global_flag){
+
+//            // Rebuild the transformation matrix using a rotation into the base frame
+//            Eigen::Matrix3d curr_rot;
+//            curr_rot << rot[0][0], rot[0][1], rot[0][2],
+//                        rot[1][0], rot[1][1], rot[1][2],
+//                        rot[2][0], rot[2][1], rot[2][2];
+//            Eigen::Vector3d curr_pos = Eigen::Vector3d(pos_t.x,pos_t.y,pos_t.z);
+
+
+//            Eigen::Matrix3d global_ROT_mat = chai3dToMatrix3d(global_base_pose->rot_mat);
+
+//            // Transform into the global frame
+//            Eigen::Matrix3d rot_adjusted = global_ROT_mat*curr_rot;
+//            Eigen::Vector3d pos_adjusted = global_ROT_mat*curr_pos;
+
+//            // Generate the transformation matrix
+//            curr_trans << rot_adjusted(0,0), rot_adjusted(0,1), rot_adjusted(0,2), pos_adjusted.x(),
+//                        rot_adjusted(1,0), rot_adjusted(1,1), rot_adjusted(1,2), pos_adjusted.y(),
+//                        rot_adjusted(2,0), rot_adjusted(2,1), rot_adjusted(2,2), pos_adjusted.z(),
+//                        0.0      , 0.0      , 0.0      , 1.0;
+//        }else{
+
+
+            curr_trans << rot[0][0], rot[0][1], rot[0][2], pos_t.x,
+                          rot[1][0], rot[1][1], rot[1][2], pos_t.y,
+                          rot[2][0], rot[2][1], rot[2][2], pos_t.z,
+                          0.0      , 0.0      , 0.0      , 1.0;
+//        }
+
         pose_struct = buildStructfromTransMatrix(curr_trans, polaris_num);
     }else{
         //qDebug() << "TRACKER NOT IN RANGE";
@@ -569,6 +608,14 @@ void ApplicationWidget::updateLCD(QLCDNumber* x_val, QLCDNumber* y_val, QLCDNumb
         y_val->display(-1000);
         z_val->display(-1000);
     }
+}
+
+Eigen::Matrix3d chai3dToMatrix3d(chai3d::cMatrix3d matrix){
+    Eigen::Matrix3d mat_out;
+    mat_out << matrix(0,0), matrix(0,1),matrix(0,2),
+            matrix(1,0), matrix(1,1), matrix(1,2),
+            matrix(2,0), matrix(2,1), matrix(2,2);
+    return mat_out;
 }
 
 //multiply above by global inv rot mat

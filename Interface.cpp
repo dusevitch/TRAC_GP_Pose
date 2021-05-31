@@ -274,12 +274,12 @@ void Interface::updateLCDpos(){
 
 void Interface::on_zoom_out_clicked()
 {
-    Application->m_camera->setLocalPos(Application->m_camera->getLocalPos() + chai3d::cVector3d(0,0,100));
+    Application->m_camera->setLocalPos(Application->m_camera->getLocalPos() + Application->global_base_pose->rot_mat*chai3d::cVector3d(0,0,50));
 }
 
 void Interface::on_zoom_in_clicked()
 {
-    Application->m_camera->setLocalPos(Application->m_camera->getLocalPos() + chai3d::cVector3d(0,0,-100));
+    Application->m_camera->setLocalPos(Application->m_camera->getLocalPos() + Application->global_base_pose->rot_mat*chai3d::cVector3d(0,0,-50));
 }
 
 
@@ -377,4 +377,19 @@ void Interface::on_load_gp_phantom_clicked()
     Application->load_gp_phantom();
     ui.gp_phantom_label->setText("PHANTOM LOADED");
     ui.gp_file_label->setText("NO FILE");
+}
+
+void Interface::on_scale_button_toggled(bool checked)
+{
+
+    if (checked){
+        int scale_factor_value = ui.scale_val->text().toDouble();
+        qDebug() << "scale factor: " << scale_factor_value;
+        Application->cochlea_path->scaleSize(scale_factor_value);
+        Application->cochlea_path->last_scale_factor = scale_factor_value;
+    }else{
+
+        Application->cochlea_path->scaleSize(1/Application->cochlea_path->last_scale_factor);
+        Application->cochlea_path->last_scale_factor = 1;
+    }
 }
