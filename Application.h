@@ -125,7 +125,16 @@ public:
 
     // Tools
 //    GuidedTool* omnimagBase;
-//    GuidedTool* omniTool;
+    // TEST VARIABLES:
+    chai3d::cMultiMesh* gpBlock_base;
+    chai3d::cShapeSphere* gp_base;
+    chai3d::cShapeSphere* gpAxisDev_base;
+
+    GuidedTool* omniTool;
+//    chai3d::cMultiMesh* omniToolBlock;
+//    chai3d::cShapeSphere* omniTool;
+//    chai3d::cShapeSphere* omniToolAxisDev;
+
 
     double x_omnimag_pos;
     double y_omnimag_pos;
@@ -141,12 +150,12 @@ public:
 
     QString loaded_file = "NO FILE LOADED";
 
-    polarisTransformMatrix cochleaPose;
+    polarisTransformMatrix *cochleaPose;
 
     std::vector<Eigen::Vector3d> cochlea_path_field_points;
     std::vector<Eigen::Vector3d> cochlea_path_pos_points;
 
-
+    chai3d::cVector3d mag_offset = chai3d::cVector3d(0,200,0); // offset of where to position magnet w.r.t cochlea
 
 //    Eigen::Matrix3d get_pos_rot(const Eigen::Matrix4d& trans_base, int polaris_tool_num, double &global_x, double &global_y, double &global_z);
 //    void transformVector(const Eigen::Matrix4d& transformation_matrix, Eigen::Vector4d vector, double& toolPos_x, double& toolPos_y, double& toolPos_z, int inv);
@@ -163,6 +172,7 @@ public:
 
     polarisTransformMatrix *camera_trans_mat; // Camera view matrix in polaris frame (p^T_v)
 
+    int base_flag = 0; // initially neither phantom nor cochlea is selected
 
     void updateStaticMarkers();
     void load_gp_file();
@@ -170,14 +180,6 @@ public:
 
     bool polaris_on = true; // turn on/off polaris
 
-    // TEST VARIABLES:
-    chai3d::cMultiMesh* gpBlock_base;
-    chai3d::cShapeSphere* gp_base;
-    chai3d::cShapeSphere* gpAxisDev_base;
-
-    chai3d::cMultiMesh* omniToolBlock;
-    chai3d::cShapeSphere* omniTool;
-    chai3d::cShapeSphere* omniToolAxisDev;
 
 
     void updateLCD(QLCDNumber* x_val, QLCDNumber* y_val, QLCDNumber* z_val, polarisTransformMatrix* pose);

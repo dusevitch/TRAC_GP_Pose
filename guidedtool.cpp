@@ -29,10 +29,18 @@ GuidedTool::GuidedTool(chai3d::cWorld *world)
     // add the object Sphere to the world
     world->addChild(cursor);
     cursor->setUseTransparency(true, false);
-    cursor->setTransparencyLevel(1);
-    cursor->setLocalPos(chai3d::cVector3d(0,0,0));
     cursorAxisDev->setUseTransparency(true, false);
-    cursorAxisDev->setTransparencyLevel(1);
+//    cursorBlock->loadFromFile("/home/telerobotics/src/TRAC_CI_Position/stl_devices/Omnimag_cube_stl_front.STL"); // TODO uncomment
+//    cursorBlock->scale(1);
+//    cursorBlock->setLocalPos(chai3d::cVector3d(0,0,0));
+//    cursorBlock->setLocalRot(chai3d::cMatrix3d(1, 0, 0, 0)); // this formulation is vector for axis and radians angle.;
+//    cursorBlock->setUseTransparency(true, true);
+
+    cursor->setTransparencyLevel(0);
+//    cursorBlock->setTransparencyLevel(1);
+    cursorAxisDev->setTransparencyLevel(0);
+
+//    cursor->setLocalPos(chai3d::cVector3d(0,0,0));
 
     arrowZ = new chai3d::cMesh();
     arrowY = new chai3d::cMesh();
@@ -352,8 +360,8 @@ void GuidedTool::createTool()
     cursorBlock->scale(stl_scale_value);
     cursorBlock->setLocalPos(chai3d::cVector3d(0,0,0));
     cursorBlock->setLocalRot(chai3d::cMatrix3d(1, 0, 0, 0)); // this formulation is vector for axis and radians angle.;
-    cursorBlock->setUseTransparency(true, false);
-    cursorBlock->setTransparencyLevel(0); //(Transparency level 1 is fully Transparent)
+    cursorBlock->setUseTransparency(true, true);
+    cursorBlock->setTransparencyLevel(1); //(Transparency level 1 is fully Transparent)
 
     initializeArrows();
 }
@@ -768,7 +776,7 @@ void GuidedTool::updateStraightArrows()
 //    }
 //}
 
-void GuidedTool::updatePoseAlignment(polarisTransformMatrix* base_pose, chai3d::cVector3d tool_position, chai3d::cMatrix3d tool_rotation, chai3d::cMultiMesh* base_tool)
+void GuidedTool::updatePoseAlignment(polarisTransformMatrix* base_pose, chai3d::cVector3d tool_position, chai3d::cMatrix3d tool_rotation, chai3d::cMultiMesh* base_tool, chai3d::cVector3d mag_offset)
 {
     // Set Guided tool position and rotation
     setPosition(tool_position);
@@ -780,15 +788,17 @@ void GuidedTool::updatePoseAlignment(polarisTransformMatrix* base_pose, chai3d::
     getKValues(base_pose->rot_mat);
 
     //Get the position values
-    cur_pos_x_offset = base_pose->pos.x() - pos.x();
-    cur_pos_y_offset = base_pose->pos.y() - pos.y();
-    cur_pos_z_offset = base_pose->pos.z() - pos.z();
+    cur_pos_x_offset = (base_pose->pos.x() + mag_offset.x()) - pos.x();
+    cur_pos_y_offset = (base_pose->pos.y() + mag_offset.y()) - pos.y();
+    cur_pos_z_offset = (base_pose->pos.z() + mag_offset.z()) - pos.z();
 
     // Clear All Arrows
     allArrowsTransparent(circ_arrow_array);
     allArrowsTransparent(arrow_array);
 
     //std::cout << "K vals:  X: " << k.x() << " Y: " << k.y() << " Z: " << k.z() << "  rot_epsilon: " << rot_epsilon <<" arrow_guidance_selected: " << arrow_guidance_selected << " circ_or_straight: "<< circ_or_straight << std::endl;
+    qDebug() << "Pos of k" <<  " X: " << k.x() << " Y: " << k.y() << " Z: " << k.z();
+
 
     //TODO: uncomment this for the future when you want to
     // circ_or_straight 0 -> for updating Circular Arrows, 1 -> for updating straight arrows

@@ -40,7 +40,9 @@ public:
     void updateCircularArrows(int dof);
     void updateStraightArrows();
     //void updatePoseAlignment(GuidedTool* base_tool, chai3d::cVector3d tool_position, chai3d::cMatrix3d tool_rotation);
-    void updatePoseAlignment(polarisTransformMatrix* base_pose, chai3d::cVector3d tool_position, chai3d::cMatrix3d tool_rotation, chai3d::cMultiMesh* base_tool);
+    //void updatePoseAlignment(polarisTransformMatrix* base_pose, chai3d::cVector3d tool_position, chai3d::cMatrix3d tool_rotation, chai3d::cMultiMesh* base_tool);
+    void updatePoseAlignment(polarisTransformMatrix* base_pose, chai3d::cVector3d tool_position, chai3d::cMatrix3d tool_rotation, chai3d::cMultiMesh* base_tool, chai3d::cVector3d mag_offset=chai3d::cVector3d(0,0,0));
+
     int* getArrowTransparency(chai3d::cMesh* arrow_array[6]);
     //void updatePoseAlignment(chai3d::cMultiMesh* cursorblockbase, chai3d::cVector3d base_loc_position, chai3d::cMatrix3d base_loc_rotation, chai3d::cVector3d tool_position, chai3d::cMatrix3d tool_rotation);
 

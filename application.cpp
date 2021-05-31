@@ -6,6 +6,7 @@
 
 //------------------------------------------------------------------------------
 #include "Application.h"
+//#include "toolarrows.cpp"
 //------------------------------------------------------------------------------
 #include <QFile>
 
@@ -99,7 +100,7 @@ ApplicationWidget::ApplicationWidget (QWidget *parent)
 //    m_camera->set(global_base_pose->pos + global_base_pose->inv_rot_mat*cVector3d(0.0, 0.0, 1000.0),    // camera position (eye)
 //                cVector3d(0.0, 0.0, 0.0),    // lookat position (target)
 //                cVector3d(global_base_pose->pos.x(), 0.0, 0.0));   // direction of the (up) vector
-    m_camera->set(cVector3d(0.0, 0.0, 0.0),    // camera position (eye)
+    m_camera->set(global_base_pose->pos +global_base_pose->inv_rot_mat*cVector3d(250,100,1000), // camera position (eye)
                  global_base_pose->pos,    // lookat position (target)
                  global_base_pose->rot_mat.getCol0());   // direction of the (up) vector
 
@@ -166,34 +167,32 @@ ApplicationWidget::ApplicationWidget (QWidget *parent)
     gpBlock_base->setTransparencyLevel(.3);
 
 
-    //    // OMNIMAGNET
-    omniToolBlock = new chai3d::cMultiMesh();
-    omniTool = new chai3d::cShapeSphere(0.05);
-    omniToolAxisDev = new chai3d::cShapeSphere(0.01);
-    // Add children to the main object sphere
-    omniTool->addChild(omniToolAxisDev);
-    omniTool->addChild(omniToolBlock);
-    // add the object Sphere to the world
-    m_world->addChild(omniTool);
-    omniTool->setUseTransparency(true, false);
-    omniToolAxisDev->setUseTransparency(true, false);
-    omniToolBlock->loadFromFile("/home/telerobotics/src/TRAC_CI_Position/stl_devices/Omnimag_cube_stl_front.STL"); // TODO uncomment
-    omniToolBlock->scale(1);
-    omniToolBlock->setLocalPos(chai3d::cVector3d(0,0,0));
-    omniToolBlock->setLocalRot(chai3d::cMatrix3d(1, 0, 0, 0)); // this formulation is vector for axis and radians angle.;
-    omniToolBlock->setUseTransparency(true, true);
+//    //    // OMNIMAGNET
+//    omniToolBlock = new chai3d::cMultiMesh();
+//    omniTool = new chai3d::cShapeSphere(0.05);
+//    omniToolAxisDev = new chai3d::cShapeSphere(0.01);
+//    // Add children to the main object sphere
+//    omniTool->addChild(omniToolAxisDev);
+//    omniTool->addChild(omniToolBlock);
+//    // add the object Sphere to the world
+//    m_world->addChild(omniTool);
+//    omniTool->setUseTransparency(true, false);
+//    omniToolAxisDev->setUseTransparency(true, false);
+//    omniToolBlock->loadFromFile("/home/telerobotics/src/TRAC_CI_Position/stl_devices/Omnimag_cube_stl_front.STL"); // TODO uncomment
+//    omniToolBlock->scale(1);
+//    omniToolBlock->setLocalPos(chai3d::cVector3d(0,0,0));
+//    omniToolBlock->setLocalRot(chai3d::cMatrix3d(1, 0, 0, 0)); // this formulation is vector for axis and radians angle.;
+//    omniToolBlock->setUseTransparency(true, true);
 
-    omniTool->setTransparencyLevel(0);
-    omniToolBlock->setTransparencyLevel(1);
-    omniToolAxisDev->setTransparencyLevel(0);
+//    omniTool->setTransparencyLevel(0);
+//    omniToolBlock->setTransparencyLevel(1);
+//    omniToolAxisDev->setTransparencyLevel(0);
 
 
-//    // GUIDED OMNIMAGNET TOOL
-//    omniTool = new GuidedTool(m_world);
-//    omniTool->loadToolFile("/home/telerobotics/src/TRAC_CI_Position/json_files/omnimag_settings.json",0); // TODO Uncomment
-    omniTool->setTransparencyLevel(0);
-    omniToolBlock->setTransparencyLevel(1);
-    omniToolAxisDev->setTransparencyLevel(0);
+    // GUIDED OMNIMAGNET TOOL
+    omniTool = new GuidedTool(m_world);
+    omniTool->loadToolFile("/home/telerobotics/src/TRAC_CI_Position/json_files/omnimag_settings.json",0); // TODO Uncomment
+
 
 }
 //------------------------------------------------------------------------------
@@ -239,11 +238,17 @@ void* ApplicationWidget::hapticThread ()
 
             // omni_pose update position
             omnimag_pose = getPoseData(1);
-            printVector3d(omnimag_pose->pos, "omnimag pos");
-            printVector3d(global_base_pose->pos, "global pos");
-            omniTool->setLocalPos(omnimag_pose->pos);
-            omniTool->setLocalRot(omnimag_pose->rot_mat);
-            //omniTool->updatePoseAlignment(global_base_pose, omnimag_pose->pos, omnimag_pose->rot_mat, gpBlock_base);
+            //printVector3d(omnimag_pose->pos, "omnimag pos");
+            //printVector3d(global_base_pose->pos, "global pos");
+
+            if(base_flag==1){ // flag for phantom
+                omniTool->updatePoseAlignment(gp_phantom_pose, omnimag_pose->pos, omnimag_pose->rot_mat, gpBlock_base, global_base_pose->rot_mat*mag_offset);
+            }else if (base_flag==2){ // Flag for actual cochlea
+                omniTool->updatePoseAlignment(cochleaPose, omnimag_pose->pos, omnimag_pose->rot_mat, gpBlock_base, global_base_pose->rot_mat*mag_offset);
+            }else{ // Neither phantom data or cochlea data loaded
+                omniTool->setPosition(omnimag_pose->pos);
+                omniTool->setOrientation(omnimag_pose->rot_mat);
+            }
 
             // Get the pose data for the wand
             wand_pose = getPoseData(4);
@@ -268,18 +273,32 @@ void* ApplicationWidget::hapticThread ()
 
 // CHANGE THE CAMERA ANGLE --> connect button to do this:
 void ApplicationWidget::updateCamera_to_base(){
+    if (base_flag==0){
+        qDebug() << "ERROR: COULDN'T FIND LOADED BASE POSITION!!";
+    }else{
+        if (base_flag==1){ // the phantom position
+            m_camera->set(gp_phantom_pose->pos +global_base_pose->rot_mat*cVector3d(0,0,1000), // camera position (eye)
+                     gp_phantom_pose->pos,    // look at position (target)
+                     global_base_pose->rot_mat.getCol0());   // direction of the (up) vector
+        }else{ // the loaded gp file position
+            m_camera->set(cochleaPose->pos +global_base_pose->rot_mat*cVector3d(0,0,1000), // camera position (eye)
+                     cochleaPose->pos,    // look at position (target)
+                     global_base_pose->rot_mat.getCol0());   // direction of the (up) vector
+        }
 
-        // CAMERA SET FUNCTION
-        chai3d::cVector3d camera_position = chai3d::cVector3d(global_base_pose->pos.x(),global_base_pose->pos.y(),global_base_pose->pos.z()) +global_base_pose->inv_rot_mat*cVector3d(0,0,1000);
-        chai3d::cVector3d look_at_position = global_base_pose->pos;
-        chai3d::cVector3d direction_up = global_base_pose->rot_mat.getCol0();
+//        // CAMERA SET FUNCTION
+//        chai3d::cVector3d camera_position = chai3d::cVector3d(global_base_pose->pos.x(),global_base_pose->pos.y(),global_base_pose->pos.z()) +global_base_pose->inv_rot_mat*cVector3d(0,0,1000);
+//        chai3d::cVector3d look_at_position = global_base_pose->pos;
+//        chai3d::cVector3d direction_up = global_base_pose->rot_mat.getCol0();
 
-        m_camera->set(camera_position, look_at_position, direction_up);
+//        m_camera->set(camera_position, look_at_position, direction_up);
+    }
 }
 
 
 void ApplicationWidget::load_gp_file(){
     // File Dialog
+    base_flag=2;
 
     QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::AnyFile);
@@ -323,21 +342,22 @@ void ApplicationWidget::load_gp_file(){
             input_trans_mat[1][0],input_trans_mat[1][1],input_trans_mat[1][2],
             input_trans_mat[2][0],input_trans_mat[2][1],input_trans_mat[2][2];
 
-    cochleaPose.rot_mat = mat;
-    cochleaPose.pos = Eigen::Vector3d(cochlea_pos[0], cochlea_pos[1], cochlea_pos[2]);
+    cochleaPose->rot_mat = mat;
+    cochleaPose->pos = Eigen::Vector3d(cochlea_pos[0], cochlea_pos[1], cochlea_pos[2]);
 
-    m_parent->ui.co_pos_x->display( cochleaPose.pos.x());
-    m_parent->ui.co_pos_y->display( cochleaPose.pos.y());
-    m_parent->ui.co_pos_z->display( cochleaPose.pos.z());
+    m_parent->ui.co_pos_x->display( cochleaPose->pos.x());
+    m_parent->ui.co_pos_y->display( cochleaPose->pos.y());
+    m_parent->ui.co_pos_z->display( cochleaPose->pos.z());
 
-    gp_base->setLocalPos(cochleaPose.pos + cVector3d(0,200,0));
-    gp_base->setLocalRot(cochleaPose.rot_mat);
+    gp_base->setLocalPos(cochleaPose->pos + global_base_pose->rot_mat*mag_offset);
+    gp_base->setLocalRot(cochleaPose->rot_mat);
 
     loaded_file = fileNames[0];
 }
 
 void ApplicationWidget::load_gp_phantom(){
     gp_phantom_pose = getPoseData(3);
+    base_flag=1;
 
     cMatrix3d mat = gp_phantom_pose->rot_mat;
 
@@ -345,7 +365,7 @@ void ApplicationWidget::load_gp_phantom(){
     m_parent->ui.co_pos_y->display( gp_phantom_pose->pos.y());
     m_parent->ui.co_pos_z->display( gp_phantom_pose->pos.z());
 
-    gp_base->setLocalPos(gp_phantom_pose->pos + cVector3d(0,0,0));
+    gp_base->setLocalPos(gp_phantom_pose->pos + global_base_pose->rot_mat*mag_offset);
     gp_base->setLocalRot(mat);
 }
 
