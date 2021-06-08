@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>600</height>
+    <height>676</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -268,7 +268,7 @@
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>250</y>
+            <y>280</y>
             <width>41</width>
             <height>16</height>
            </rect>
@@ -281,7 +281,7 @@
           <property name="geometry">
            <rect>
             <x>43</x>
-            <y>240</y>
+            <y>270</y>
             <width>81</width>
             <height>31</height>
            </rect>
@@ -291,7 +291,7 @@
           <property name="geometry">
            <rect>
             <x>123</x>
-            <y>240</y>
+            <y>270</y>
             <width>81</width>
             <height>31</height>
            </rect>
@@ -301,7 +301,7 @@
           <property name="geometry">
            <rect>
             <x>200</x>
-            <y>240</y>
+            <y>270</y>
             <width>81</width>
             <height>31</height>
            </rect>
@@ -318,6 +318,19 @@
           </property>
           <property name="text">
            <string>No file</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="export_path_file">
+          <property name="geometry">
+           <rect>
+            <x>90</x>
+            <y>240</y>
+            <width>121</width>
+            <height>22</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Export Path File</string>
           </property>
          </widget>
         </widget>

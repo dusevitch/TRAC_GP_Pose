@@ -13,7 +13,7 @@
         "Z": 0.0,
         "Rad": 0
     },
-    "trans_epsilon": 1,
+    "trans_epsilon": 2,
     "rot_epsilon": 3,
     "scale_factor": 1,
     "Straight_Arrows_Config": {

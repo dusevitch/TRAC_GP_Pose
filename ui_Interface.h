@@ -60,6 +60,7 @@ public:
     QLCDNumber *wand_y;
     QLCDNumber *wand_z;
     QLabel *gp_phantom_label;
+    QPushButton *export_path_file;
     QHBoxLayout *horizontalLayout_2;
     QPushButton *hide_show_base;
     QPushButton *hide_show_tool;
@@ -92,7 +93,7 @@ public:
     {
         if (InterfaceClass->objectName().isEmpty())
             InterfaceClass->setObjectName(QString::fromUtf8("InterfaceClass"));
-        InterfaceClass->resize(800, 600);
+        InterfaceClass->resize(800, 676);
         QIcon icon;
         icon.addFile(QString::fromUtf8(":/chai3d.ico"), QSize(), QIcon::Normal, QIcon::Off);
         InterfaceClass->setWindowIcon(icon);
@@ -186,19 +187,22 @@ public:
         load_gp_phantom->setGeometry(QRect(10, 210, 121, 22));
         label_3 = new QLabel(frame);
         label_3->setObjectName(QString::fromUtf8("label_3"));
-        label_3->setGeometry(QRect(10, 250, 41, 16));
+        label_3->setGeometry(QRect(10, 280, 41, 16));
         wand_x = new QLCDNumber(frame);
         wand_x->setObjectName(QString::fromUtf8("wand_x"));
-        wand_x->setGeometry(QRect(43, 240, 81, 31));
+        wand_x->setGeometry(QRect(43, 270, 81, 31));
         wand_y = new QLCDNumber(frame);
         wand_y->setObjectName(QString::fromUtf8("wand_y"));
-        wand_y->setGeometry(QRect(123, 240, 81, 31));
+        wand_y->setGeometry(QRect(123, 270, 81, 31));
         wand_z = new QLCDNumber(frame);
         wand_z->setObjectName(QString::fromUtf8("wand_z"));
-        wand_z->setGeometry(QRect(200, 240, 81, 31));
+        wand_z->setGeometry(QRect(200, 270, 81, 31));
         gp_phantom_label = new QLabel(frame);
         gp_phantom_label->setObjectName(QString::fromUtf8("gp_phantom_label"));
         gp_phantom_label->setGeometry(QRect(148, 210, 121, 20));
+        export_path_file = new QPushButton(frame);
+        export_path_file->setObjectName(QString::fromUtf8("export_path_file"));
+        export_path_file->setGeometry(QRect(90, 240, 121, 22));
 
         verticalLayout->addWidget(frame);
 
@@ -394,6 +398,7 @@ public:
         load_gp_phantom->setText(QApplication::translate("InterfaceClass", "Load GP Phantom", 0, QApplication::UnicodeUTF8));
         label_3->setText(QApplication::translate("InterfaceClass", "Wand", 0, QApplication::UnicodeUTF8));
         gp_phantom_label->setText(QApplication::translate("InterfaceClass", "No file", 0, QApplication::UnicodeUTF8));
+        export_path_file->setText(QApplication::translate("InterfaceClass", "Export Path File", 0, QApplication::UnicodeUTF8));
         hide_show_base->setText(QApplication::translate("InterfaceClass", "Hide Base", 0, QApplication::UnicodeUTF8));
         hide_show_tool->setText(QApplication::translate("InterfaceClass", "Hide Tool", 0, QApplication::UnicodeUTF8));
         x_neg->setText(QApplication::translate("InterfaceClass", "neg", 0, QApplication::UnicodeUTF8));

@@ -92,7 +92,8 @@ SOURCES   += application.cpp \
     Interface.cpp \
     main.cpp \
     guidedtool.cpp \
-    cochleapath.cpp
+    cochleapath.cpp \
+    functions.cpp
 
 HEADERS   += Application.h \
     Interface.h \

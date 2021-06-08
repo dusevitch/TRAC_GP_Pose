@@ -4,6 +4,7 @@
 */
 //==============================================================================
 
+#pragma once
 //------------------------------------------------------------------------------
 #include "Application.h"
 //#include "toolarrows.cpp"
@@ -22,6 +23,7 @@
 #include <ctime>
 #include <cstdlib>
 #include <QFileDialog>
+#include "functions.cpp"
 
 double PI = 3.1415926;
 
@@ -33,14 +35,7 @@ using namespace arma;
 //------------------------------------------------------------------------------
 
 IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
-// Local Functions used by the Class
-void printMatrix3d(chai3d::cMatrix3d matrix, std::string name);
-void printVector3d(chai3d::cVector3d vec, QString name);
-Eigen::Matrix4d inverseTransformationMatrix(const Eigen::Matrix4d &trans_mat);
-polarisTransformMatrix* buildStructfromTransMatrix(Eigen::Matrix4d &trans_mat, int polaris_num);
-void breakTransMat(Eigen::Matrix4d &trans_mat, chai3d::cMatrix3d &rot, chai3d::cVector3d &pos);
-Eigen::Matrix4d buildTransMatrix(chai3d::cMatrix3d rot, chai3d::cVector3d pos);
-Eigen::Matrix3d chai3dToMatrix3d(chai3d::cMatrix3d matrix);
+
 
 ApplicationWidget::ApplicationWidget (QWidget *parent)
 {
@@ -252,6 +247,11 @@ void* ApplicationWidget::hapticThread ()
                 omniTool->setOrientation(omnimag_pose->rot_mat);
             }
 
+            // Update the positon/orientation of the cochlea path and field arrows
+            if (base_flag!=0){
+                cochlea_path->updateFieldPath(omnimag_pose);
+            }
+
             // Get the pose data for the wand
             wand_pose = getPoseData(4);
 
@@ -376,7 +376,8 @@ void ApplicationWidget::load_gp_phantom(){
     //gp_base->setLocalPos(gp_phantom_pose->pos + mag_offset);
     gp_base->setLocalRot(mat);
 
-    cochlea_path = new CochleaPath("phantom_b_vectors_normalized_left.csv", gp_phantom_pose->pos, m_world, global_base_pose->rot_mat);
+    //cochlea_path = new CochleaPath("phantom_b_vectors_normalized_left.csv", gp_phantom_pose->pos, m_world, omnimag_pose->rot_mat,global_base_pose->rot_mat);
+    cochlea_path = new CochleaPath("FIELDS/phantom_scaled_values.csv", gp_phantom_pose->pos, m_world, omnimag_pose, mag_offset);
 
 }
 
@@ -436,51 +437,6 @@ polarisTransformMatrix* ApplicationWidget::getPoseData(int polaris_num, bool glo
     delete pose_struct;
 }
 
-Eigen::Matrix4d inverseTransformationMatrix(const Eigen::Matrix4d &trans_mat){
-    // Remove the rotation and position matrices
-    Eigen::Matrix3d rot = trans_mat.topLeftCorner(3,3);
-    Eigen::Vector4d pos = trans_mat.col(3);
-
-    // transpose of the rotation
-    Eigen::Matrix3d rot_t = rot.transpose();
-
-    // Generate inverse transformation matrix and return
-    Eigen::Vector3d inv_pos = -rot_t*pos.head(3);
-    Eigen::Matrix4d inv_trans_mat;
-    inv_trans_mat << rot_t(0,0), rot_t(0,1), rot_t(0,2), inv_pos(0),
-                     rot_t(1,0), rot_t(1,1), rot_t(1,2), inv_pos(1),
-                     rot_t(2,0), rot_t(2,1), rot_t(2,2), inv_pos(2),
-                     0,           0,           0,           1;
-
-    return inv_trans_mat;
-}
-
-polarisTransformMatrix* buildStructfromTransMatrix(Eigen::Matrix4d &trans_mat, int polaris_num){
-    polarisTransformMatrix* pose_struct = new polarisTransformMatrix();
-
-    // Rotation
-    Eigen::Matrix3d rot_eig = trans_mat.topLeftCorner(3,3);
-    pose_struct->rot_mat = chai3d::cMatrix3d(rot_eig(0,0), rot_eig(0,1),rot_eig(0,2),rot_eig(1,0),rot_eig(1,1),rot_eig(1,2),rot_eig(2,0),rot_eig(2,1),rot_eig(2,2));
-
-    // Inverse Rotation
-    chai3d::cMatrix3d inv_rot_mat;
-    inv_rot_mat.copyfrom(pose_struct->rot_mat); //copy
-    inv_rot_mat.trans();
-    pose_struct->inv_rot_mat = inv_rot_mat;
-
-    //Position
-    Eigen::Vector4d pos_vec = trans_mat.col(3);
-    pose_struct->pos = cVector3d(pos_vec(0), pos_vec(1), pos_vec(2));
-
-    // Transformation matrix and Inverse Transformation matrix
-    pose_struct->trans_mat = trans_mat;
-    pose_struct->inv_trans_mat = inverseTransformationMatrix(trans_mat);
-
-    pose_struct->polaris_num = polaris_num;
-    // Return and delete
-    return pose_struct;
-    delete pose_struct;
-}
 
 //------------------------------------------------------------------------------
 
@@ -564,39 +520,6 @@ void _hapticThread (void *arg)
 
 //------------------------------------------------------------------------------
 
-void printMatrix3d(chai3d::cMatrix3d matrix, std::string name)
-{
-    std::cout << "-------MATRIX: "<< name << " :---- " << std::endl;
-    std::cout << matrix.getCol0().x() << ", " << matrix.getCol1().x() << ", " << matrix.getCol2().x() << std::endl;
-    std::cout << matrix.getCol0().y() << ", " << matrix.getCol1().y() << ", " << matrix.getCol2().y() << std::endl;
-    std::cout << matrix.getCol0().z() << ", " << matrix.getCol1().z() << ", " << matrix.getCol2().z() << std::endl;
-    std::cout << "----------------" << std::endl;
-}
-
-void printVector3d(chai3d::cVector3d vec, QString name)
-{
-    qDebug() << "Pos of " <<  name <<  " X: " << vec.x() << " Y: " << vec.y() << " Z: " << vec.z();
-//    std::cout << "Pos of " <<  name.toStdString() <<  " X: " << vec.x() << " Y: " << vec.y() << " Z: " << vec.z() << std::endl;
-}
-
-Eigen::Matrix4d buildTransMatrix(chai3d::cMatrix3d rot, chai3d::cVector3d pos){
-    Eigen::Matrix4d trans_mat;
-
-    trans_mat << rot(0,0), rot(0,1), rot(0,2), pos(0),
-                 rot(1,0), rot(1,1), rot(1,2), pos(1),
-                 rot(2,0), rot(2,1), rot(2,2), pos(2),
-                 0,           0,           0,      1;
-    return trans_mat;
-}
-
-void breakTransMat(Eigen::Matrix4d &trans_mat, chai3d::cMatrix3d rot, chai3d::cVector3d pos){
-    // Rotation Matrix
-    Eigen::Matrix3d rot_eig = trans_mat.topLeftCorner(3,3);
-    rot = chai3d::cMatrix3d(rot_eig(0,0), rot_eig(0,1),rot_eig(0,2),rot_eig(1,0),rot_eig(1,1),rot_eig(1,2),rot_eig(2,0),rot_eig(2,1),rot_eig(2,2));
-
-    // Position Vector
-    pos = chai3d::cVector3d(rot_eig(3,0), rot_eig(3,1), rot_eig(3,2));
-}
 
 void ApplicationWidget::updateLCD(QLCDNumber* x_val, QLCDNumber* y_val, QLCDNumber* z_val, polarisTransformMatrix* pose){
     if (polaris->m_dtHandleInformation[pose->polaris_num].Xfrms.ulFlags == TRANSFORM_VALID ) {
@@ -610,12 +533,6 @@ void ApplicationWidget::updateLCD(QLCDNumber* x_val, QLCDNumber* y_val, QLCDNumb
     }
 }
 
-Eigen::Matrix3d chai3dToMatrix3d(chai3d::cMatrix3d matrix){
-    Eigen::Matrix3d mat_out;
-    mat_out << matrix(0,0), matrix(0,1),matrix(0,2),
-            matrix(1,0), matrix(1,1), matrix(1,2),
-            matrix(2,0), matrix(2,1), matrix(2,2);
-    return mat_out;
-}
+
 
 //multiply above by global inv rot mat

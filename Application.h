@@ -30,6 +30,7 @@
 #include <eigen3/Eigen/Dense>
 #include "cochleapath.h"
 
+
 void _hapticThread (void *arg);
 
 //------------------------------------------------------------------------------
@@ -156,7 +157,7 @@ public:
     std::vector<Eigen::Vector3d> cochlea_path_field_points;
     std::vector<Eigen::Vector3d> cochlea_path_pos_points;
 
-    chai3d::cVector3d mag_offset = chai3d::cVector3d(0,200,0); // offset of where to position magnet w.r.t cochlea
+    chai3d::cVector3d mag_offset = chai3d::cVector3d(0,160,0); // offset of where to position magnet w.r.t cochlea
 
 //    Eigen::Matrix3d get_pos_rot(const Eigen::Matrix4d& trans_base, int polaris_tool_num, double &global_x, double &global_y, double &global_z);
 //    void transformVector(const Eigen::Matrix4d& transformation_matrix, Eigen::Vector4d vector, double& toolPos_x, double& toolPos_y, double& toolPos_z, int inv);

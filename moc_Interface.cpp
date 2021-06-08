@@ -22,7 +22,7 @@ static const uint qt_meta_data_Interface[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-      15,   14, // methods
+      16,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -45,6 +45,7 @@ static const uint qt_meta_data_Interface[] = {
      285,   10,   10,   10, 0x08,
      309,   10,   10,   10, 0x08,
      338,  202,   10,   10, 0x08,
+     368,   10,   10,   10, 0x08,
 
        0        // eod
 };
@@ -61,6 +62,7 @@ static const char qt_meta_stringdata_Interface[] = {
     "on_pushButton_clicked()\0"
     "on_load_gp_phantom_clicked()\0"
     "on_scale_button_toggled(bool)\0"
+    "on_export_path_file_clicked()\0"
 };
 
 void Interface::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -84,6 +86,7 @@ void Interface::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
         case 12: _t->on_pushButton_clicked(); break;
         case 13: _t->on_load_gp_phantom_clicked(); break;
         case 14: _t->on_scale_button_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 15: _t->on_export_path_file_clicked(); break;
         default: ;
         }
     }
@@ -121,9 +124,9 @@ int Interface::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 15)
+        if (_id < 16)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 15;
+        _id -= 16;
     }
     return _id;
 }

@@ -393,3 +393,8 @@ void Interface::on_scale_button_toggled(bool checked)
         Application->cochlea_path->last_scale_factor = 1;
     }
 }
+
+void Interface::on_export_path_file_clicked()
+{
+    Application->cochlea_path->exportFieldArrowCSV("FIELDS/output_field_position.csv");
+}

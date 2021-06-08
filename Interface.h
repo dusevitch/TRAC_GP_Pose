@@ -121,6 +121,8 @@ private slots:
 
     void on_scale_button_toggled(bool checked);
 
+    void on_export_path_file_clicked();
+
 public:
 
     int  Start();
